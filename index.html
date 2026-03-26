@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InternHub — Students & Recruiters Portal</title>
+  <meta name="description" content="Students find and apply for internships. Recruiters post jobs and review applications and resumes."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet"/>
+  <script>
+    // Quick debugging
+    console.log('Page loading...');
+  </script>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="Router.go('landing')">
+      Intern<span class="s">Hub</span>
+    </div>
+    <div class="nav-links" id="nav-links"></div>
+    <div class="nav-right" id="nav-right"></div>
+    <button class="mob-btn" onclick="openMob()">☰</button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer -->
+<div id="mob-drawer">
+  <div class="drawer-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="nav-logo" style="font-size:1.1rem">Intern<span class="s">Hub</span></div>
+      <button onclick="closeMob()" style="background:none;border:none;font-size:1.3rem;color:var(--tx2);cursor:pointer">✕</button>
+    </div>
+    <div id="drawer-links"></div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div id="toast-root"></div>
+
+<!-- Modal -->
+<div id="modal-bg">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div id="modal-head-slot"></div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body-slot"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: LANDING ════════════════════════════════════════ -->
+<div class="page" id="page-landing">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <div class="hero-badge">🚀 New Platform — Students &amp; Recruiters</div>
+      <h1 class="hero-title">
+        The Internship Portal for<br>
+        <span class="hl-s">Students</span> &amp; <span class="hl-r">Recruiters</span>
+      </h1>
+      <p class="hero-desc">
+        Students discover and apply to top internships — upload your resume and track applications.
+        Recruiters post jobs, review applicants, and download resumes. All in one place.
+      </p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary btn-xl" onclick="Router.go('register',{role:'student'})">
+          I'm a Student →
+        </button>
+        <button class="btn btn-recruiter btn-xl" onclick="Router.go('register',{role:'recruiter'})">
+          I'm a Recruiter →
+        </button>
+      </div>
+    </div>
+
+    <!-- Role panels -->
+    <div class="hero-split">
+      <div class="hero-panel sp" onclick="Router.go('register',{role:'student'})">
+        <div class="hp-ico">🎓</div>
+        <div class="hp-t">For Students</div>
+        <p class="hp-d">Browse internships, upload your resume, apply in seconds, and track all your applications.</p>
+        <div class="hp-link s">Get Started <span>→</span></div>
+      </div>
+      <div class="hero-panel" onclick="Router.go('register',{role:'recruiter'})">
+        <div class="hp-ico">🏢</div>
+        <div class="hp-t">For Recruiters</div>
+        <p class="hp-d">Post internship roles, manage applications, and review student resumes — all from a clean dashboard.</p>
+        <div class="hp-link r">Post a Job <span>→</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="sstat"><div class="sstat-n" style="color:var(--ac)">6+</div><div class="sstat-l">Open Roles</div></div>
+    <div class="sstat"><div class="sstat-n" style="color:var(--rc)">∞</div><div class="sstat-l">Recruiters Welcome</div></div>
+    <div class="sstat"><div class="sstat-n" style="color:var(--ac)">PDF</div><div class="sstat-l">Resume Upload</div></div>
+    <div class="sstat"><div class="sstat-n" style="color:var(--rc)">100%</div><div class="sstat-l">Free to Use</div></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-row">
+    <div class="sbar">
+      <svg class="sbar-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="s-q" placeholder="Search by title or company…" autocomplete="off" oninput="doSearch()"/>
+      <div class="sbar-div"></div>
+      <select id="s-loc" class="sbar-sel" onchange="doSearch()">
+        <option value="">All Locations</option>
+        <option>Remote</option>
+        <option>Bengaluru</option>
+        <option>Mumbai</option>
+        <option>Hyderabad</option>
+        <option>Pune</option>
+        <option>Delhi</option>
+        <option>Chennai</option>
+      </select>
+      <div class="sbar-div"></div>
+      <select id="s-skill" class="sbar-sel" onchange="doSearch()">
+        <option value="">All Skills</option>
+        <option>Python</option>
+        <option>JavaScript</option>
+        <option>React</option>
+        <option>SQL</option>
+        <option>ML</option>
+        <option>Figma</option>
+        <option>AWS</option>
+        <option>Node.js</option>
+      </select>
+      <button class="sbar-clr" id="s-clr" style="display:none" onclick="clearSearch()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- Job listings -->
+  <div class="wrap" style="padding-bottom:72px">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">Open Internships</div>
+      </div>
+      <span id="job-count" style="font-size:.82rem;color:var(--tx3)"></span>
+    </div>
+    <div class="card-grid" id="job-grid"></div>
+  </div>
+
+</div><!-- /page-landing -->
+
+
+<!-- ══ PAGE: BROWSE JOBS ════════════════════════════════════ -->
+<div class="page" id="page-browse">
+  <div class="browse-container" style="display:flex;gap:24px;max-width:1300px;margin:0 auto;padding:32px 20px">
+    
+    <!-- Sidebar Filters -->
+    <div class="browse-sidebar" style="width:260px;flex-shrink:0">
+      <div style="position:sticky;top:80px;display:flex;flex-direction:column;gap:24px">
+        
+        <!-- Search Input -->
+        <div>
+          <label class="form-label" style="font-weight:600;margin-bottom:10px">Search</label>
+          <div class="icon-input">
+            <span class="i-ico">🔍</span>
+            <input type="text" id="b-q" placeholder="Job title, company…" class="form-input" oninput="doBrowseSearch()"/>
+          </div>
+        </div>
+
+        <!-- Location Filter -->
+        <div>
+          <label class="form-label" style="font-weight:600;margin-bottom:10px">Location</label>
+          <select id="b-loc" class="form-select" onchange="doBrowseSearch()" style="width:100%">
+            <option value="">All Locations</option>
+            <option value="Remote">Remote</option>
+            <option value="Bengaluru">Bengaluru</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Pune">Pune</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Chennai">Chennai</option>
+            <option value="Kolkata">Kolkata</option>
+          </select>
+        </div>
+
+        <!-- Duration Filter -->
+        <div>
+          <label class="form-label" style="font-weight:600;margin-bottom:10px">Duration</label>
+          <select id="b-dur" class="form-select" onchange="doBrowseSearch()" style="width:100%">
+            <option value="">All Durations</option>
+            <option value="1 month">1 month</option>
+            <option value="2 months">2 months</option>
+            <option value="3 months">3 months</option>
+            <option value="4 months">4 months</option>
+            <option value="6 months">6 months</option>
+            <option value="12 months">12 months</option>
+          </select>
+        </div>
+
+        <!-- Skills Filter -->
+        <div>
+          <label class="form-label" style="font-weight:600;margin-bottom:12px">Skills</label>
+          <div style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;padding-right:8px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="Python" onchange="doBrowseSearch()"/> Python
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="JavaScript" onchange="doBrowseSearch()"/> JavaScript
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="React" onchange="doBrowseSearch()"/> React
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="SQL" onchange="doBrowseSearch()"/> SQL
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="ML" onchange="doBrowseSearch()"/> Machine Learning
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="Figma" onchange="doBrowseSearch()"/> Figma
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="AWS" onchange="doBrowseSearch()"/> AWS
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="Node.js" onchange="doBrowseSearch()"/> Node.js
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="TypeScript" onchange="doBrowseSearch()"/> TypeScript
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--tx2)">
+              <input type="checkbox" class="skill-checkbox" value="Java" onchange="doBrowseSearch()"/> Java
+            </label>
+          </div>
+          <div id="selected-skills" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+
+        <!-- Paid/Unpaid Filter -->
+        <div>
+          <label class="form-label" style="font-weight:600;margin-bottom:10px">Job Type</label>
+          <select id="b-pay" class="form-select" onchange="doBrowseSearch()" style="width:100%">
+            <option value="">All Jobs</option>
+            <option value="paid">Paid 💰</option>
+            <option value="unpaid">Unpaid 🤝</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <button class="btn btn-ghost" style="width:100%" onclick="clearBrowseFilters()">
+          ✕ Clear All Filters
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="browse-main" style="flex:1;min-width:0">
+      <!-- Header -->
+      <div style="margin-bottom:30px">
+        <div class="sec-title" style="margin-bottom:8px">Browse Internships</div>
+        <p style="color:var(--tx2);font-size:.9rem" id="browse-results-count">Loading jobs…</p>
+      </div>
+
+      <!-- Job Results -->
+      <div id="browse-grid" style="display:flex;flex-direction:column;gap:16px"></div>
+
+    </div>
+
+  </div>
+</div><!-- /page-browse -->
+
+
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo student" id="login-logo">IH</div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub" id="login-sub">
+        No account? <a class="s" onclick="Router.go('register',{role:'student'})">Sign up free →</a>
+      </p>
+
+      <!-- Role tabs -->
+      <div class="role-tabs">
+        <button class="role-tab on student" id="login-role-student" onclick="switchLoginRole('student')">🎓 Student</button>
+        <button class="role-tab" id="login-role-recruiter" onclick="switchLoginRole('recruiter')">🏢 Recruiter</button>
+      </div>
+
+      <div class="alert alert-error" id="login-alert" style="display:none"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="icon-input">
+          <span class="i-ico">✉️</span>
+          <input class="form-input" type="email" id="l-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="icon-input" style="position:relative">
+          <span class="i-ico">🔒</span>
+          <input class="form-input" type="password" id="l-pw" placeholder="••••••••" autocomplete="current-password"/>
+          <button class="eye-btn" data-target="l-pw" type="button">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-block" id="login-submit-btn" onclick="doLogin()" style="margin-top:8px">
+        Sign In →
+      </button>
+
+      <div class="divider"><span>or try a demo</span></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn btn-ghost" onclick="demoStudentLogin()">🎓 Demo Student</button>
+        <button class="btn" style="background:var(--rcbg2);color:var(--rc);border:none" onclick="demoRecruiterLogin()">🏢 Demo Recruiter</button>
+      </div>
+
+      <p class="auth-foot" style="margin-top:18px">
+        New here? <a class="s" onclick="Router.go('register',{role:'student'})">Create an account →</a>
+      </p>
+    </div>
+  </div>
+</div><!-- /page-login -->
+
+
+<!-- ══ PAGE: REGISTER ═══════════════════════════════════════ -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo student" id="reg-logo">IH</div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-sub" id="reg-sub">
+        Already have one? <a class="s" onclick="Router.go('login',{role:'student'})">Sign in →</a>
+      </p>
+
+      <!-- Role tabs -->
+      <div class="role-tabs">
+        <button class="role-tab on student" id="reg-role-student" onclick="switchRegRole('student')">🎓 I'm a Student</button>
+        <button class="role-tab" id="reg-role-recruiter" onclick="switchRegRole('recruiter')">🏢 I'm a Recruiter</button>
+      </div>
+
+      <div class="alert alert-error" id="reg-alert" style="display:none"></div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <div class="icon-input">
+          <span class="i-ico">👤</span>
+          <input class="form-input" type="text" id="r-name" placeholder="Aarav Sharma" autocomplete="name"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="icon-input">
+          <span class="i-ico">✉️</span>
+          <input class="form-input" type="email" id="r-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+      </div>
+
+      <!-- Company field — shown only for recruiter -->
+      <div class="form-group" id="company-field">
+        <label class="form-label">Company Name</label>
+        <div class="icon-input">
+          <span class="i-ico">🏢</span>
+          <input class="form-input" type="text" id="r-company" placeholder="e.g. Acme Technologies" autocomplete="organization"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="icon-input" style="position:relative">
+          <span class="i-ico">🔒</span>
+          <input class="form-input" type="password" id="r-pw" placeholder="Min. 6 characters" autocomplete="new-password"/>
+          <button class="eye-btn" data-target="r-pw" type="button">👁</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="icon-input" style="position:relative">
+          <span class="i-ico">🔒</span>
+          <input class="form-input" type="password" id="r-confirm" placeholder="Repeat password" autocomplete="new-password"/>
+          <button class="eye-btn" data-target="r-confirm" type="button">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-block" id="reg-submit-btn" onclick="doRegister()" style="margin-top:8px">
+        Create Account →
+      </button>
+
+      <p class="auth-foot">
+        By registering you agree to our <a>Terms</a> &amp; <a>Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+</div><!-- /page-register -->
+
+
+<!-- ══ PAGE: STUDENT DASHBOARD ══════════════════════════════ -->
+<div class="page" id="page-student-dash">
+  <div class="dash-wrap">
+
+    <!-- Header -->
+    <div class="dash-top">
+      <div>
+        <div class="dash-greet">Hey, <span class="hl" id="s-dash-name">Student</span> 👋</div>
+        <p class="dash-sub">Track your applications and manage your resume</p>
+      </div>
+      <button class="btn btn-danger" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign Out
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="dash-stats">
+      <div class="dstat"><div class="dstat-l">Applications</div><div class="dstat-v ac" id="s-stat-applied">0</div></div>
+      <div class="dstat"><div class="dstat-l">Open Roles</div><div class="dstat-v" id="s-stat-open">0</div></div>
+      <div class="dstat"><div class="dstat-l">Offers Received</div><div class="dstat-v" id="s-stat-offers">0</div></div>
+      <div class="dstat"><div class="dstat-l">Resume</div><div class="dstat-v" id="s-stat-resume">—</div></div>
+      <div class="dstat"><div class="dstat-l">Profile</div><div class="dstat-v" style="font-size:1rem;color:var(--green)">Active ✓</div></div>
+    </div>
+
+    <!-- Tab nav -->
+    <div style="display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid var(--bd);padding-bottom:0">
+      <button class="s-tab nav-btn on" data-tab="jobs"   onclick="renderStudentDash('jobs')"  style="border-radius:8px 8px 0 0;padding:10px 18px">📋 My Applications</button>
+      <button class="s-tab nav-btn"    data-tab="offers" onclick="renderStudentDash('offers')" style="border-radius:8px 8px 0 0;padding:10px 18px">📧 Offers Received</button>
+      <button class="s-tab nav-btn"    data-tab="interviews" onclick="renderStudentDash('interviews')" style="border-radius:8px 8px 0 0;padding:10px 18px">🎙️ My Interviews</button>
+      <button class="s-tab nav-btn"    data-tab="saved"  onclick="renderStudentDash('saved')" style="border-radius:8px 8px 0 0;padding:10px 18px">❤️ Saved Jobs</button>
+      <button class="s-tab nav-btn"    data-tab="resume" onclick="renderStudentDash('resume')" style="border-radius:8px 8px 0 0;padding:10px 18px">📄 My Resume</button>
+      <button class="s-tab nav-btn"    data-tab="browse" onclick="Router.go('browse')"        style="border-radius:8px 8px 0 0;padding:10px 18px">🔍 Browse Jobs</button>
+    </div>
+
+    <!-- Tab: Applications + Suggested -->
+    <div class="s-tab-panel" data-tab="jobs">
+      <div class="dash-sec">
+        <div class="dash-sec-hdr">
+          <div class="sec-title">My Applications</div>
+          <button class="btn btn-primary btn-sm" onclick="Router.go('browse')">+ Browse More</button>
+        </div>
+        <div class="app-list" id="s-app-list"></div>
+      </div>
+      <div class="dash-sec">
+        <div class="dash-sec-hdr"><div class="sec-title">Recommended for You</div></div>
+        <div id="s-suggested"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Offers Received -->
+    <div class="s-tab-panel" data-tab="offers" style="display:none">
+      <div class="dash-sec">
+        <div class="dash-sec-hdr">
+          <div class="sec-title">Offers Received</div>
+          <div class="sec-sub">View and confirm your job offers</div>
+        </div>
+        <div id="s-offers"></div>
+      </div>
+    </div>
+
+    <!-- Tab: My Interviews -->
+    <div class="s-tab-panel" data-tab="interviews" style="display:none">
+      <div class="dash-sec">
+        <div class="dash-sec-hdr">
+          <div class="sec-title">My Interviews & Technical Rounds</div>
+          <div class="sec-sub">View and attend your scheduled interviews</div>
+        </div>
+        <div id="s-interviews"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Saved Jobs -->
+    <div class="s-tab-panel" data-tab="saved" style="display:none">
+      <div class="dash-sec">
+        <div class="dash-sec-hdr">
+          <div class="sec-title">Your Saved Jobs</div>
+          <span class="sec-sub" id="saved-count" style="margin-left:12px;color:var(--tx2)"></span>
+        </div>
+        <div id="s-saved-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Resume -->
+    <div class="s-tab-panel" data-tab="resume" style="display:none">
+      <div class="dash-sec">
+        <div class="dash-sec-hdr">
+          <div>
+            <div class="sec-title">My Resume</div>
+            <div class="sec-sub">Upload a PDF, DOC or DOCX · Recruiters can view and download it</div>
+          </div>
+          <label for="resume-file-input">
+            <span class="btn btn-primary btn-sm" style="cursor:pointer">⬆ Upload New</span>
+          </label>
+          <input type="file" id="resume-file-input" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none"/>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="resume-zone" id="resume-zone">
+          <div id="rz-content">
+            <div class="rz-ico">📤</div>
+            <div class="rz-ttl">Upload your Resume</div>
+            <p class="rz-sub">PDF, DOC or DOCX · Max 5MB</p>
+            <p class="rz-sub" style="margin-top:6px">Drag &amp; drop or click to browse</p>
+          </div>
+        </div>
+
+        <div class="alert alert-info" style="margin-top:18px">
+          ℹ️ Your resume is visible to recruiters when you apply to their internships. Keep it updated!
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /page-student-dash -->
+
+
+<!-- ══ PAGE: RECRUITER DASHBOARD ════════════════════════════ -->
+<div class="page" id="page-recruiter-dash">
+  <div class="rec-dash">
+
+    <!-- Header -->
+    <div class="rec-top">
+      <div>
+        <div class="rec-greet">Welcome, <span class="hl" id="r-dash-name">Recruiter</span> 👋</div>
+        <p class="dash-sub"><span id="r-dash-company" style="color:var(--rc)"></span> · Recruiter Dashboard</p>
+      </div>
+      <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-recruiter btn-lg" onclick="openPostJobModal()">+ Post New Job</button>
+        <button class="btn btn-danger" onclick="doLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="rec-stats">
+      <div class="rstat"><div class="rstat-l">Jobs Posted</div><div class="rstat-v rc" id="r-stat-jobs">0</div></div>
+      <div class="rstat"><div class="rstat-l">Total Applicants</div><div class="rstat-v" id="r-stat-apps">0</div></div>
+      <div class="rstat"><div class="rstat-l">Active Listings</div><div class="rstat-v" id="r-stat-active">0</div></div>
+      <div class="rstat"><div class="rstat-l">Selected Candidates</div><div class="rstat-v" id="r-stat-selected">0</div></div>
+      <div class="rstat"><div class="rstat-l">Reviewed</div><div class="rstat-v" id="r-stat-reviewed">0</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid var(--bd)">
+      <button class="r-tab nav-btn on" data-tab="jobs"       onclick="renderRecruiterDash('jobs')"       style="border-radius:8px 8px 0 0;padding:10px 18px">📋 My Jobs</button>
+      <button class="r-tab nav-btn"    data-tab="applicants" onclick="renderRecruiterDash('applicants')" style="border-radius:8px 8px 0 0;padding:10px 18px">👥 Applicants &amp; Resumes</button>
+      <button class="r-tab nav-btn"    data-tab="offers" onclick="renderRecruiterDash('offers')" style="border-radius:8px 8px 0 0;padding:10px 18px">📧 Selected Candidates & Offers</button>
+      <button class="r-tab nav-btn"    data-tab="interviews" onclick="renderRecruiterDash('interviews')" style="border-radius:8px 8px 0 0;padding:10px 18px">🎙️ Technical Rounds & Interviews</button>
+    </div>
+
+    <!-- Tab: My Jobs -->
+    <div class="r-tab-panel" data-tab="jobs">
+      <div class="rec-sec">
+        <div class="rec-sec-hdr">
+          <div class="sec-title">Your Job Listings</div>
+          <button class="btn btn-recruiter btn-sm" onclick="openPostJobModal()">+ Post Job</button>
+        </div>
+        <div id="r-job-list"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Applicants -->
+    <div class="r-tab-panel" data-tab="applicants" style="display:none">
+      <div class="rec-sec">
+        <div class="rec-sec-hdr">
+          <div>
+            <div class="sec-title">All Applicants</div>
+            <div class="sec-sub">View cover notes, update application status, and download resumes</div>
+          </div>
+        </div>
+        <div id="r-applicants"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Selected Candidates & Offers -->
+    <div class="r-tab-panel" data-tab="offers" style="display:none">
+      <div class="rec-sec">
+        <div class="rec-sec-hdr">
+          <div class="sec-title">Selected Candidates & Offers</div>
+          <div class="sec-sub">View selected candidates and send offer letters</div>
+        </div>
+        <div id="r-offers"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Technical Rounds & Interviews -->
+    <div class="r-tab-panel" data-tab="interviews" style="display:none">
+      <div class="rec-sec">
+        <div class="rec-sec-hdr">
+          <div class="sec-title">Technical Rounds & Interviews</div>
+          <div class="sec-sub">Schedule technical rounds and interviews for selected candidates</div>
+        </div>
+        <div id="r-interviews"></div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /page-recruiter-dash -->
+
+
+<!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo" onclick="Router.go('landing')">
+      Intern<span class="s">Hub</span>
+    </div>
+    <span>© 2026 — HTML, CSS &amp; JavaScript · No backend required</span>
+    <div style="display:flex;gap:16px;font-size:.8rem;color:var(--tx3)">
+      <span style="cursor:pointer" onclick="Router.go('landing')">Browse</span>
+      <span style="cursor:pointer" onclick="Router.go('register',{role:'student'})">Students</span>
+      <span style="cursor:pointer" onclick="Router.go('register',{role:'recruiter'})">Recruiters</span>
+    </div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
